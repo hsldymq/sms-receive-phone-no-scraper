@@ -1,0 +1,25 @@
+{
+    "name": "hsldymq/sms-receive-phone-no-scraper",
+    "autoload": {
+        "psr-4": {
+            "Hsldymq\\SMS\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "hsldymq",
+            "email": "hsldymq@qq.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.4",
+        "rinvex/countries": "^8.1",
+        "chibifr/country-converter": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "brightnucleus/country-codes": false
+        }
+    }
+}
