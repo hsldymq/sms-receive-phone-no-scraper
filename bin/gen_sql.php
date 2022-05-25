@@ -9,7 +9,7 @@ require __DIR__.'/../vendor/autoload.php';
 (new class extends \ChibiFR\CountryConverter\Converter {
     private array $data;
 
-    private string $origin = 'smscodeonline.com';
+    private string $origin = 'receive-sms-online.info';
 
     public function __construct()
     {
@@ -32,8 +32,8 @@ require __DIR__.'/../vendor/autoload.php';
      */
     public function v1()
     {
-//        $this->v1GenOriginSQL();
-//        $this->v1GenPhoneSQL('free');
+        $this->v1GenOriginSQL();
+        $this->v1GenPhoneSQL('free');
     }
 
     private function v1GenOriginSQL()
@@ -100,6 +100,8 @@ require __DIR__.'/../vendor/autoload.php';
     {
         $c = strtolower($countryName);
         return [
+            'south korea' => 'Korea, Republic of',
+            'usa' => 'United States of America',
             'united states' => 'United States of America',
             'united kingdom' => 'United Kingdom of Great Britain and Northern Ireland',
             'france, french republic' => 'France',
@@ -107,6 +109,7 @@ require __DIR__.'/../vendor/autoload.php';
             'vietnam' => 'Viet Nam',
             'korea' => 'Korea, Republic of',
             'switzerland, swiss confederation' => 'Switzerland',
+            'russia' => 'Russian Federation',
         ][$c] ?? $countryName;
     }
 
