@@ -35,12 +35,55 @@ class SMSManAPI
         return [$number, $requestID];
     }
 
-    public function getLimit(string $appID, string $countryID): int
+    public function getNumberLimitsByCountryID(string $countryID, ?string $orderBy = null): array
     {
-        $url = "http://api.sms-man.com/control/limits?token={$this->token}&country_id={$countryID}&application_id={$appID}";
-        $data = $this->doRequest($url);
+        $result = [];
+        $data = $this->getNumberLimits('', $countryID);
+        foreach ($data as $each) {
+            $result[$each['application_id']] = ['appID' => strval($each['application_id']), 'numbers' => $each['numbers']];
+        }
 
-        return $data[$appID]['numbers'];
+        $orderBy = $orderBy !== null ? strtolower($orderBy) : null;
+        if ($orderBy === 'asc') {
+            uasort($result, fn($a, $b) => $a['numbers'] <=> $b['numbers']);
+        } else if ($orderBy === 'desc') {
+            uasort($result, fn($a, $b) => $b['numbers'] <=> $a['numbers']);
+        }
+
+        return array_values($result);
+    }
+
+    public function getNumberLimit(string $appID, string $countryID): int
+    {
+        $data = $this->getNumberLimits($appID, $countryID);
+
+        return intval($data[$appID]['numbers']);
+    }
+
+    public function getNumberLimits(string $appID = '', string $countryID = ''): array
+    {
+        $url = "http://api.sms-man.com/control/limits?token={$this->token}";
+        if ($appID) {
+            $url .= "&application_id={$appID}";
+        }
+        if ($countryID) {
+            $url .= "&country_id={$countryID}";
+        }
+
+        return $this->doRequest($url);
+    }
+
+    public function getTotalNumbersForCountries(): array
+    {
+        $result = [];
+        foreach ($this->getNumberLimits() as $countries) {
+            foreach ($countries as $each) {
+                $result[$each['country_id']] = ($result[$each['country_id']] ?? 0) + $each['numbers'];
+            }
+        }
+        uasort($result, fn($a, $b) => $b <=> $a);
+
+        return $result;
     }
 
     private function doRequest(string $url): array
