@@ -63,7 +63,8 @@ use Hsldymq\SMS\Utils\PhoneNoParser;
 
             ensureAll:
             while (count($numbers) < $remainNum * 0.8) {
-                echo "$count: $countryID - $appID ... ";
+                $countryCode = $this->api->getCodeByID($countryID, false);
+                echo "$count: $countryID($countryCode) - $appID ... ";
                 try {
                     $this->fetchAndRelease($appID, $countryID, $numbers);
                 } catch (APIError $e) {

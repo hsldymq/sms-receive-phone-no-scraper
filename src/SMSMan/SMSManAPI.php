@@ -78,12 +78,52 @@ class SMSManAPI
         $result = [];
         foreach ($this->getNumberLimits() as $countries) {
             foreach ($countries as $each) {
-                $result[$each['country_id']] = ($result[$each['country_id']] ?? 0) + $each['numbers'];
+                $countryID = $each['country_id'];
+                if (!isset($result[$countryID])) {
+                    $result[$countryID] = [
+                        'countryCode' => $this->getCodeByID($countryID, true),
+                        'numbers' => 0,
+                    ];
+                }
+                $result[$countryID]['numbers'] += $each['numbers'];
+
             }
         }
         uasort($result, fn($a, $b) => $b <=> $a);
 
         return $result;
+    }
+
+    public function getAllCountryIDs(): array
+    {
+        $countries = $this->tryFetchCountries();
+
+        return array_keys($countries);
+    }
+
+    public function getCodeByID(string $id, bool $throw): string
+    {
+        $countries = $this->tryFetchCountries();
+        if (!isset($countries[$id]) && $throw) {
+            throw new \InvalidArgumentException('no such country id found');
+        }
+
+        return $countries[$id] ?? '';
+    }
+
+    private function tryFetchCountries(): array
+    {
+        static $countries = null;
+
+        if ($countries === null) {
+            $countries = [];
+            $data = $this->doRequest("http://api.sms-man.com/control/countries?token={$this->token}");
+            foreach ($data as $each) {
+                $countries[$each['id']] = $each['code'];
+            }
+        }
+
+        return $countries;
     }
 
     private function doRequest(string $url): array
